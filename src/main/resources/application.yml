@@ -1,0 +1,68 @@
+spring:
+  application:
+    name: person-api
+  
+  # PostgreSQL Connection Properties
+  datasource:
+    url: jdbc:postgresql://localhost:5432/persondb
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  
+  # Database Initialization
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+
+# Server Configuration
+server:
+  port: 8080
+
+# Management
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics,prometheus"
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+      uri: "http_server_requests"
+    endpoint:
+      metrics:
+        enabled: true
+      prometheus:
+        enabled: true
+      health:
+        show-details: always
+    distribution:
+      percentiles-histogram: # enable histogram for percentile
+        http.server.requests: true
+      slo:
+        http.server.requests: 10ms, 50ms, 100ms, 500ms, 1s
+
+# Logging
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{trace_id:-N/A}] [%X{span_id:-N/A}] %-5level %logger{36} - %msg%n"
+  level:
+    com:
+      ps:
+        person: DEBUG
+
+# OpenAPI/Swagger Configuration
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+  info:
+    title: Person API
+    description: API for managing person records
+    version: 1.0.0

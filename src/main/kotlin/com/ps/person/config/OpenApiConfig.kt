@@ -1,8 +1,8 @@
 package com.ps.person.config
 
 import io.swagger.v3.oas.models.OpenAPI
-import io.swagger.v3.oas.models.info.Info
 import io.swagger.v3.oas.models.info.Contact
+import io.swagger.v3.oas.models.info.Info
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.event.ApplicationStartedEvent
@@ -42,7 +42,7 @@ class OpenApiConfig(private val environment: Environment) : ApplicationListener<
         val protocol = if (environment.getProperty("server.ssl.enabled") == "true") "https" else "http"
         val hostAddress = "localhost"
         val contextPath = environment.getProperty("server.servlet.context-path") ?: ""
-        
+
         val swaggerUrl = "$protocol://$hostAddress:$serverPort$contextPath$swaggerPath"
         logger.info("Swagger UI is available at: $swaggerUrl")
     }

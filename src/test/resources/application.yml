@@ -1,0 +1,35 @@
+# Test-specific configuration
+spring:
+  application:
+    name: person-api
+
+  # Database configuration for tests
+  datasource:
+    url: jdbc:postgresql://localhost:5432/persondb
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  
+  # Database Initialization
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+
+# Enable all actuator endpoints for testing
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    prometheus:
+      enabled: true
+  metrics:
+    tags:
+      application: person-api
+    distribution:
+      percentiles-histogram:
+        http:
+          servers:
+            requests: true
