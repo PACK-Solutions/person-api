@@ -1,0 +1,56 @@
+### Person API Advanced HTTP Requests
+
+### Variables
+@baseUrl = http://localhost:8080
+@apiPath = /api/persons
+@contentType = application/json
+
+### Create a person and capture the ID
+# This request creates a person and captures the ID for use in subsequent requests
+POST {{baseUrl}}{{apiPath}}
+Content-Type: {{contentType}}
+Accept: {{contentType}}
+
+{
+  "firstname": "Alex",
+  "lastname": "Smith",
+  "dateOfBirth": "1988-07-12",
+  "cityOfBirth": "London",
+  "countryOfBirth": "UK",
+  "nationality": "British"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 201, "Response status is not 201 Created");
+    });
+    
+    client.global.set("createdPersonId", response.body.id);
+    client.log("Created person with ID: " + client.global.get("createdPersonId"));
+%}
+
+### Get the created person
+GET {{baseUrl}}{{apiPath}}/{{createdPersonId}}
+Accept: {{contentType}}
+
+### Get all persons
+GET {{baseUrl}}{{apiPath}}
+Accept: {{contentType}}
+
+### Update the created person
+PUT {{baseUrl}}{{apiPath}}/{{createdPersonId}}
+Content-Type: {{contentType}}
+Accept: {{contentType}}
+
+{
+  "firstname": "Alexander",
+  "lastname": "Smith",
+  "dateOfBirth": "1988-07-12",
+  "cityOfBirth": "Manchester",
+  "countryOfBirth": "UK",
+  "nationality": "British"
+}
+
+### Delete the created person
+DELETE {{baseUrl}}{{apiPath}}/{{createdPersonId}}
+Accept: {{contentType}}
