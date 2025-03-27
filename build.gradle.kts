@@ -33,6 +33,9 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
+    // For Gravatar and base64 encoding
+    implementation("commons-codec:commons-codec:1.18.0")
+
     // OpenAPI/Swagger UI
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0")
 

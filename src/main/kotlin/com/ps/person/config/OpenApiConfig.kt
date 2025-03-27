@@ -1,8 +1,11 @@
 package com.ps.person.config
 
+import io.swagger.v3.oas.models.ExternalDocumentation
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.info.Contact
 import io.swagger.v3.oas.models.info.Info
+import io.swagger.v3.oas.models.info.License
+import io.swagger.v3.oas.models.servers.Server
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.event.ApplicationStartedEvent
@@ -28,13 +31,42 @@ class OpenApiConfig(private val environment: Environment) : ApplicationListener<
             .info(
                 Info()
                     .title("Person API")
-                    .description("API for managing person records")
+                    .description("""
+                        API for managing person records with the following attributes:
+
+                        * First name
+                        * Last name
+                        * Date of birth
+                        * City of birth
+                        * Country of birth
+                        * Nationality
+                        * Avatar (automatically generated)
+
+                        The API provides CRUD operations for person entities and automatically generates avatars for new persons.
+                    """.trimIndent())
                     .version("1.0.0")
                     .contact(
                         Contact()
                             .name("API Support")
                             .email("support@example.com")
+                            .url("https://example.com/support")
                     )
+                    .license(
+                        License()
+                            .name("Apache 2.0")
+                            .url("https://www.apache.org/licenses/LICENSE-2.0.html")
+                    )
+                    .termsOfService("https://example.com/terms")
+            )
+            .externalDocs(
+                ExternalDocumentation()
+                    .description("Person API Documentation")
+                    .url("https://example.com/docs")
+            )
+            .addServersItem(
+                Server()
+                    .url("/")
+                    .description("Current server")
             )
     }
 

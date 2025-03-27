@@ -14,15 +14,15 @@ const requestDuration = new Trend('request_duration');
 // Configuration for moderate load testing
 export const options = {
     stages: [
-        {duration: '10s', target: 5},   // Ramp-up to 5 users
-        {duration: '30s', target: 10},   // Ramp-up to 10 users
-        {duration: '2m', target: 10},   // Stay at 10 users for 2 minutes
-        {duration: '1m', target: 15},   // Ramp-up to 15 users
-        {duration: '2m', target: 15},   // Stay at 15 users for 2 minutes
-        {duration: '1m', target: 0},    // Ramp-down to 0 users
+        {duration: '5s', target: 5},   // Ramp-up to 5 users
+        {duration: '5s', target: 15},
+        {duration: '5s', target: 30},
+        {duration: '10s', target: 30},
+        {duration: '5s', target: 15},
+        {duration: '5s', target: 0},    // Ramp-down to 0 users
     ],
     thresholds: {
-        http_req_duration: ['p(95)<500'], // 95% of requests should be below 500ms
+        http_req_duration: ['p(95)<200'], // 95% of requests should be below 200ms
         success_rate: ['rate>0.95'],      // 95% of requests should be successful
     },
 };
@@ -39,8 +39,8 @@ function randomDateOfBirth() {
 // Generate random person data
 function generatePersonData() {
     return {
-        firstname: `John${randomString(5)}`,
-        lastname: `Doe${randomString(5)}`,
+        firstName: `John${randomString(5)}`,
+        lastName: `Doe${randomString(5)}`,
         dateOfBirth: randomDateOfBirth(),
         cityOfBirth: `City${randomString(3)}`,
         countryOfBirth: `Country${randomString(3)}`,
@@ -123,8 +123,8 @@ export default function () {
     // Update person
     const updatedPersonData = {
         ...personData,
-        firstname: `Updated${randomString(5)}`,
-        lastname: `Updated${randomString(5)}`,
+        firstName: `Updated${randomString(5)}`,
+        lastName: `Updated${randomString(5)}`,
     };
 
     const updateResponse = http.put(`${baseUrl}/${personId}`, JSON.stringify(updatedPersonData), params);
@@ -134,7 +134,7 @@ export default function () {
         'update person status is 200': (r) => r.status === 200,
         'update person returns updated data': (r) => {
             const body = JSON.parse(r.body);
-            return body.firstname.startsWith('Updated') && body.lastname.startsWith('Updated');
+            return body.firstName.startsWith('Updated') && body.lastName.startsWith('Updated');
         },
     });
 

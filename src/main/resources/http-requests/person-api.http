@@ -5,6 +5,10 @@
 @apiPath = /api/persons
 @contentType = application/json
 
+### Notes
+# The avatar field is automatically generated from Gravatar based on the person's name
+# It is only included in GET responses and stored as base64 in the database
+
 ### Create a person and capture the ID
 # This request creates a person and captures the ID for use in subsequent requests
 POST {{baseUrl}}{{apiPath}}
@@ -12,8 +16,8 @@ Content-Type: {{contentType}}
 Accept: {{contentType}}
 
 {
-  "firstname": "Alex",
-  "lastname": "Smith",
+  "firstName": "Alex",
+  "lastName": "Smith",
   "dateOfBirth": "1988-07-12",
   "cityOfBirth": "London",
   "countryOfBirth": "UK",
@@ -21,10 +25,10 @@ Accept: {{contentType}}
 }
 
 > {%
-    client.test("Request executed successfully", function() {
+    client.test("Request executed successfully", function () {
         client.assert(response.status === 201, "Response status is not 201 Created");
     });
-    
+
     client.global.set("createdPersonId", response.body.id);
     client.log("Created person with ID: " + client.global.get("createdPersonId"));
 %}
@@ -43,8 +47,8 @@ Content-Type: {{contentType}}
 Accept: {{contentType}}
 
 {
-  "firstname": "Alexander",
-  "lastname": "Smith",
+  "firstName": "Alexander",
+  "lastName": "Smith",
   "dateOfBirth": "1988-07-12",
   "cityOfBirth": "Manchester",
   "countryOfBirth": "UK",

@@ -140,9 +140,9 @@
       "id": 16,
       "options": {
         "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "vertical",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
         "percentChangeColorMode": "same_as_value",
         "reduceOptions": {
           "calcs": [
@@ -1055,6 +1055,6 @@
   "timezone": "",
   "title": "Spring Boot Observability",
   "uid": "dLsDQIUnzb",
-  "version": 19,
+  "version": 2,
   "weekStart": ""
 }

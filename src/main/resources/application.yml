@@ -1,14 +1,21 @@
 spring:
   application:
     name: person-api
-  
+
   # PostgreSQL Connection Properties
   datasource:
     url: jdbc:postgresql://localhost:5432/persondb
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
-  
+    hikari:
+      connection-timeout: 20000  # maximum wait time for a connection from the pool in milliseconds
+      minimum-idle: 5            # minimum number of idle connections maintained by HikariCP
+      maximum-pool-size: 10      # maximum pool size
+      idle-timeout: 300000       # maximum idle time for connection in milliseconds
+      max-lifetime: 1200000      # maximum lifetime in milliseconds of a connection in the pool
+      auto-commit: true
+
   # Database Initialization
   sql:
     init:
