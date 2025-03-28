@@ -133,12 +133,12 @@ k6 run k6-script.js
 
 The script will simulate user traffic according to the defined stages:
 
-- Ramp up to 5 users over 10 seconds
-- Ramp up to 10 users over 30 seconds
-- Stay at 10 users for 2 minutes
-- Ramp up to 15 users over 1 minute
-- Stay at 15 users for 2 minutes
-- Ramp down to 0 users over 1 minute
+- Ramp up to 5 users over 5 seconds
+- Ramp up to 15 users over 5 seconds
+- Ramp up to 30 users over 5 seconds
+- Stay at 30 users for 10 seconds
+- Ramp down to 15 users over 5 seconds
+- Ramp down to 0 users over 5 seconds
 
 The test results will be displayed in the console, showing metrics like:
 

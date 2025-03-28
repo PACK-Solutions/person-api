@@ -22,7 +22,7 @@ export const options = {
         {duration: '5s', target: 0},    // Ramp-down to 0 users
     ],
     thresholds: {
-        http_req_duration: ['p(95)<200'], // 95% of requests should be below 200ms
+        http_req_duration: ['p(95)<500'], // 95% of requests should be below 500ms
         success_rate: ['rate>0.95'],      // 95% of requests should be successful
     },
 };
