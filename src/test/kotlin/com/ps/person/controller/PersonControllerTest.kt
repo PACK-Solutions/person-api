@@ -1,5 +1,7 @@
 package com.ps.person.controller
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.ps.person.model.Person
 import com.ps.person.repository.PersonRepository
 import com.ps.person.service.PravatarService
@@ -9,16 +11,13 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.MediaType
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import java.time.LocalDate
 import java.util.*
 
@@ -29,10 +28,10 @@ class PersonControllerTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
 
-    @MockBean
+    @MockitoBean
     private lateinit var personRepository: PersonRepository
 
-    @MockBean
+    @MockitoBean
     private lateinit var pravatarService: PravatarService
 
     private lateinit var testPerson: Person
@@ -122,5 +121,42 @@ class PersonControllerTest {
         verify(personRepository).save(personCaptor.capture())
         val savedPerson = personCaptor.value
         assert(savedPerson.avatar == "base64encodedimage") { "Avatar should be preserved during update" }
+    }
+
+    @Test
+    fun `createPerson should return 409 when person with same firstName and lastName already exists`() {
+        // Create a new person with the same firstName and lastName as the test person
+        val newPerson = Person(
+            id = null,
+            firstName = "John",
+            lastName = "Doe",
+            dateOfBirth = LocalDate.of(1995, 5, 5),
+            cityOfBirth = "Los Angeles",
+            countryOfBirth = "USA",
+            nationality = "American"
+        )
+
+        // Mock the repository to return a list with the test person when findByFirstNameAndLastName is called
+        `when`(personRepository.findByFirstNameAndLastName("John", "Doe"))
+            .thenReturn(listOf(testPerson))
+
+        // Perform the create request
+        mockMvc.perform(
+            post("/api/persons")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(newPerson))
+        )
+            .andExpect(status().isConflict)
+            .andExpect(jsonPath("$.type").value("https://api.person.com/errors/duplicate-person"))
+            .andExpect(jsonPath("$.title").value("Duplicate Person"))
+            .andExpect(jsonPath("$.status").value(409))
+            .andExpect(jsonPath("$.detail").value("Person with the same first name and last name already exists"))
+            .andExpect(jsonPath("$.firstName").value("John"))
+            .andExpect(jsonPath("$.lastName").value("Doe"))
+
+        // Verify that the repository findByFirstNameAndLastName method was called
+        verify(personRepository).findByFirstNameAndLastName("John", "Doe")
+        // Verify that the repository save method was not called
+        verify(personRepository, never()).save(any(Person::class.java))
     }
 }

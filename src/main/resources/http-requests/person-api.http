@@ -8,6 +8,7 @@
 ### Notes
 # The avatar field is automatically generated from Gravatar based on the person's name
 # It is only included in GET responses and stored as base64 in the database
+# When creating a person with the same firstName and lastName as an existing person, a 409 Conflict error is returned
 
 ### Create a person and capture the ID
 # This request creates a person and captures the ID for use in subsequent requests
@@ -31,6 +32,39 @@ Accept: {{contentType}}
 
     client.global.set("createdPersonId", response.body.id);
     client.log("Created person with ID: " + client.global.get("createdPersonId"));
+%}
+
+### Try to create a duplicate person (should return 409 Conflict)
+# This request attempts to create a person with the same firstName and lastName as the person created above
+POST {{baseUrl}}{{apiPath}}
+Content-Type: {{contentType}}
+Accept: {{contentType}}
+
+{
+  "firstName": "Alex",
+  "lastName": "Smith",
+  "dateOfBirth": "1990-03-15",
+  "cityOfBirth": "Manchester",
+  "countryOfBirth": "UK",
+  "nationality": "British"
+}
+
+> {%
+    client.test("Response status is 409 Conflict", function () {
+        client.assert(response.status === 409, "Response status is not 409 Conflict");
+    });
+
+    client.test("Response has correct content type", function () {
+        client.assert(response.contentType.mimeType === "application/problem+json", "Expected application/problem+json but got " + response.contentType.mimeType);
+    });
+
+    client.test("Response contains error details", function () {
+        client.assert(response.body.title === "Duplicate Person", "Error title is incorrect");
+        client.assert(response.body.status === 409, "Error status is incorrect");
+        client.assert(response.body.detail === "Person with the same first name and last name already exists", "Error detail is incorrect");
+        client.assert(response.body.firstName === "Alex", "firstName property is incorrect");
+        client.assert(response.body.lastName === "Smith", "lastName property is incorrect");
+    });
 %}
 
 ### Get the created person

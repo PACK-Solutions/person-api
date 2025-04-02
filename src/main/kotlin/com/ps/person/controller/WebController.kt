@@ -101,6 +101,25 @@ class WebController(
     fun savePerson(@ModelAttribute person: Person, redirectAttributes: RedirectAttributes): String {
         try {
             logger.info("Saving person: {}", person)
+
+            // Check for duplicates only when creating a new person (not when updating)
+            if (person.id == null) {
+                val existingPersons = personRepository.findByFirstNameAndLastName(person.firstName, person.lastName)
+                if (existingPersons.isNotEmpty()) {
+                    logger.warn(
+                        "Person with firstName={} and lastName={} already exists",
+                        person.firstName,
+                        person.lastName
+                    )
+                    redirectAttributes.addFlashAttribute(
+                        "errorMessage",
+                        "A person with the same first name and last name already exists."
+                    )
+                    redirectAttributes.addFlashAttribute("person", person)
+                    return "redirect:/persons"
+                }
+            }
+
             val savedPerson = personRepository.save(person)
             logger.info("Person saved successfully with id: {}", savedPerson.id)
             redirectAttributes.addFlashAttribute(

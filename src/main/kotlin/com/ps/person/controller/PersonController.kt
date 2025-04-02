@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
+import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
@@ -124,6 +125,11 @@ class PersonController(
                 responseCode = "400",
                 description = "Invalid input data",
                 content = [Content(mediaType = "application/json")]
+            ),
+            ApiResponse(
+                responseCode = "409",
+                description = "Person with the same first name and last name already exists",
+                content = [Content(mediaType = "application/problem+json")]
             )
         ]
     )
@@ -134,12 +140,30 @@ class PersonController(
             content = [Content(schema = Schema(implementation = Person::class))]
         )
         @RequestBody person: Person
-    ): Person {
+    ): ResponseEntity<Any> {
         logger.info("Creating new person")
         logger.debug(
             "Person details: firstName={}, lastName={}, dateOfBirth={}",
             person.firstName, person.lastName, person.dateOfBirth
         )
+
+        // Check if a person with the same first name and last name already exists
+        val existingPersons = personRepository.findByFirstNameAndLastName(person.firstName, person.lastName)
+        if (existingPersons.isNotEmpty()) {
+            logger.warn("Person with firstName={} and lastName={} already exists", person.firstName, person.lastName)
+
+            // Create a ProblemDetail response according to RFC-9457
+            val problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT,
+                "Person with the same first name and last name already exists"
+            )
+            problemDetail.setProperty("firstName", person.firstName)
+            problemDetail.setProperty("lastName", person.lastName)
+            problemDetail.title = "Duplicate Person"
+            problemDetail.type = java.net.URI.create("https://api.person.com/errors/duplicate-person")
+
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(problemDetail)
+        }
 
         // First save the person to get an ID
         val savedPerson = personRepository.save(person)
@@ -148,7 +172,7 @@ class PersonController(
         val personWithAvatar = generateAndSetAvatar(savedPerson)
         logger.info("Person created successfully with id: {}", personWithAvatar.id)
 
-        return personWithAvatar
+        return ResponseEntity.status(HttpStatus.CREATED).body(personWithAvatar)
     }
 
     @PutMapping("/{id}")

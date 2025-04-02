@@ -31,7 +31,8 @@ class OpenApiConfig(private val environment: Environment) : ApplicationListener<
             .info(
                 Info()
                     .title("Person API")
-                    .description("""
+                    .description(
+                        """
                         API for managing person records with the following attributes:
 
                         * First name
@@ -43,7 +44,8 @@ class OpenApiConfig(private val environment: Environment) : ApplicationListener<
                         * Avatar (automatically generated)
 
                         The API provides CRUD operations for person entities and automatically generates avatars for new persons.
-                    """.trimIndent())
+                    """.trimIndent()
+                    )
                     .version("1.0.0")
                     .contact(
                         Contact()

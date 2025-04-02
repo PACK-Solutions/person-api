@@ -20,41 +20,41 @@ class DataInitializer(
         // Check if the database is already populated
         if (personRepository.count() == 0L) {
             logger.info("Initializing database with 3 users")
-            
+
             // Create and save 3 users
             createUser(
-                "John", 
-                "Doe", 
-                LocalDate.of(1990, 1, 15), 
-                "New York", 
-                "USA", 
+                "John",
+                "Doe",
+                LocalDate.of(1990, 1, 15),
+                "New York",
+                "USA",
                 "American"
             )
-            
+
             createUser(
-                "Jane", 
-                "Smith", 
-                LocalDate.of(1985, 5, 20), 
-                "London", 
-                "UK", 
+                "Jane",
+                "Smith",
+                LocalDate.of(1985, 5, 20),
+                "London",
+                "UK",
                 "British"
             )
-            
+
             createUser(
-                "Alice", 
-                "Johnson", 
-                LocalDate.of(1992, 8, 10), 
-                "Sydney", 
-                "Australia", 
+                "Alice",
+                "Johnson",
+                LocalDate.of(1992, 8, 10),
+                "Sydney",
+                "Australia",
                 "Australian"
             )
-            
+
             logger.info("Database initialization completed")
         } else {
             logger.info("Database already contains data, skipping initialization")
         }
     }
-    
+
     private fun createUser(
         firstName: String,
         lastName: String,
@@ -66,10 +66,10 @@ class DataInitializer(
         // Generate avatar URL based on the user's name
         val fullName = "$firstName $lastName"
         val avatarUrl = pravatarService.generatePravatarUrl(name = fullName)
-        
+
         // Fetch the avatar image and convert it to base64
         val avatarBase64 = pravatarService.fetchPravatarAsBase64(avatarUrl)
-        
+
         // Create the Person object
         val person = Person(
             firstName = firstName,
@@ -80,7 +80,7 @@ class DataInitializer(
             nationality = nationality,
             avatar = avatarBase64
         )
-        
+
         // Save the person to the database
         personRepository.save(person)
         logger.info("Created user: $firstName $lastName")
