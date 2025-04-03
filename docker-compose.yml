@@ -10,9 +10,12 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - postgres
-      - tempo
-      - fluent-bit
+      postgres:
+        condition: service_healthy
+      tempo:
+        condition: service_healthy
+      fluent-bit:
+        condition: service_healthy
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/persondb
       - SPRING_DATASOURCE_USERNAME=postgres
@@ -105,7 +108,8 @@ services:
     volumes:
       - ./etc/fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
     depends_on:
-      - loki
+      loki:
+        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -115,7 +119,7 @@ services:
           cpus: '0.1'
           memory: 64M
     healthcheck:
-      test: [ "CMD", "fluent-bit", "--help" ]
+      test: [ "CMD-SHELL", "nc -z localhost 24224 || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -133,7 +137,8 @@ services:
       - ./etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus-data:/prometheus
     depends_on:
-      - loki
+      loki:
+        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -160,7 +165,8 @@ services:
     volumes:
       - ./etc/tempo/tempo.yml:/etc/tempo-config.yml
     depends_on:
-      - loki
+      loki:
+        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -186,8 +192,10 @@ services:
       - ./etc/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
       - ./etc/dashboards:/etc/grafana/dashboards
     depends_on:
-      - loki
-      - prometheus
+      loki:
+        condition: service_healthy
+      prometheus:
+        condition: service_healthy
     deploy:
       resources:
         limits:
