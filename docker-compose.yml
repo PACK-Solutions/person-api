@@ -12,6 +12,7 @@ services:
     depends_on:
       - postgres
       - tempo
+      - fluent-bit
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/persondb
       - SPRING_DATASOURCE_USERNAME=postgres
