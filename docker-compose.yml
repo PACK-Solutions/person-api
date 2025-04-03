@@ -15,7 +15,7 @@ services:
       tempo:
         condition: service_healthy
       fluent-bit:
-        condition: service_healthy
+        condition: service_started
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/persondb
       - SPRING_DATASOURCE_USERNAME=postgres
@@ -118,12 +118,6 @@ services:
         reservations:
           cpus: '0.1'
           memory: 64M
-    healthcheck:
-      test: [ "CMD-SHELL", "nc -z localhost 24224 || exit 1" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
 
   prometheus:
     !!merge <<: *common
